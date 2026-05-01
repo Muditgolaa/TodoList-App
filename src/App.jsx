@@ -51,12 +51,10 @@ function App() {
   };
 
   const handleDelete = (e,id) => {
-    let index = todos.findIndex(item=>{
-      return item.id === id
-    })
-    let newTodos = todos.filter((item, i) => {
-      return item.id !== id;
-    })
+    let newTodos = todos.filter(item => item.id !== id);
+    // let newTodos = todos.filter((item, i) => {
+    //   return item.id !== id;
+    // })
     setTodos(newTodos)
     saveToLS()
 
