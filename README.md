@@ -1,16 +1,120 @@
-# React + Vite
+# 📝 TuDummmm - Todo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and responsive Todo application built using **React + Tailwind CSS**, designed to manage daily tasks efficiently with a clean UI and smooth user experience.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Live Demo
 
-## React Compiler
+(https://tudummmm.vercel.app/)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* ➕ Add new todos
+* ✏️ Edit existing tasks
+* 🗑️ Delete todos
+* ✅ Mark tasks as completed
+* 👀 Toggle visibility of completed tasks
+* 💾 Persistent storage using **localStorage**
+* 🎨 Clean and responsive UI with Tailwind CSS
+* 🔥 Icons using React Icons
+
+---
+
+## 🛠️ Tech Stack
+
+* ⚛️ React (Hooks: useState, useEffect)
+* 🎨 Tailwind CSS
+* ⚡ Vite
+* 🆔 UUID (for unique IDs)
+* 🎯 React Icons
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+│── components/
+│   └── Navbar.jsx
+│
+│── App.jsx
+│── main.jsx
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Muditgolaa/TodoList-App.git
+cd todo-app
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+---
+
+## 📸 Screenshots
+
+<img width="2879" height="1799" alt="image" src="https://github.com/user-attachments/assets/e2e51c1b-dab9-4f18-a0da-6ca7c6a24459" />
+<img width="1284" height="2778" alt="image" src="https://github.com/user-attachments/assets/de9ab3ef-b682-4e53-a171-acef02635112" />
+
+
+---
+
+## 🧠 What I Learned
+
+* Managing state efficiently in React
+* Implementing CRUD operations
+* Working with browser localStorage
+* Handling dynamic UI updates
+* Writing cleaner and modular components
+
+---
+
+## 🔮 Future Improvements
+
+* 🔍 Search functionality
+* 📅 Add due dates
+* 🌙 Dark mode
+* 📊 Filter (All / Completed / Pending)
+* 🔐 User authentication
+
+---
+
+## 🤝 Contributing
+
+Feel free to fork this repository and improve it. Contributions are welcome!
+
+---
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+**Mudit Gola**
+
+* GitHub: (https://github.com/Muditgolaa)
+
+---
+
+⭐ If you like this project, give it a star!
