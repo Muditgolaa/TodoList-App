@@ -1,6 +1,51 @@
-@import "tailwindcss";  
+@import "tailwindcss";
 
-body{
-    --tw-bg-opacity: 1;
-    background-color:rgb(224, 235, 245);
+/* ================= Ember design tokens ================= */
+/* Dark is the default. Light applies via OS preference OR a manual
+   [data-theme="light"] we'll set from a toggle button in Step 4.     */
+:root {
+  --bg: #16161d;         --surface: #1e1f28;   --surface-2: #262734;  --raise: #2e2f3e;
+  --border: rgba(255,255,255,.09);             --border-strong: rgba(255,255,255,.16);
+  --text: #ecebf0;       --muted: #9a9aae;     --faint: #6a6a80;
+  --amber: #f6a13d;      --amber-2: #f97316;   --amber-soft: rgba(246,161,61,.14);
+  --done: #37d29a;       --done-soft: rgba(55,210,154,.14);
+  /* heatmap heat-ramp: empty -> hottest */
+  --h0: #24252f; --h1: #5a3a1e; --h2: #8f5220; --h3: #d1791f; --h4: #f6a13d;
+
+  --font-d: "Bricolage Grotesque", system-ui, sans-serif; /* display */
+  --font-b: "Instrument Sans", system-ui, sans-serif;      /* body   */
+  --font-m: "IBM Plex Mono", ui-monospace, monospace;      /* data   */
 }
+
+/* Light tokens — same names, warmer paper values */
+:root:not([data-theme="dark"]) {
+  @media (prefers-color-scheme: light) {
+    --bg: #f4f0e7;       --surface: #fffdf8;   --surface-2: #efe8da;  --raise: #e7dfcd;
+    --border: rgba(30,24,12,.11);              --border-strong: rgba(30,24,12,.2);
+    --text: #221f18;     --muted: #6d6656;     --faint: #a29a86;
+    --amber: #c9721f;    --amber-2: #d9541b;   --amber-soft: rgba(201,114,31,.13);
+    --done: #128a5e;     --done-soft: rgba(18,138,94,.12);
+    --h0: #e9e1cf; --h1: #f2cea0; --h2: #e6a458; --h3: #d17f26; --h4: #b5641a;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f4f0e7;         --surface: #fffdf8;   --surface-2: #efe8da;  --raise: #e7dfcd;
+  --border: rgba(30,24,12,.11);                --border-strong: rgba(30,24,12,.2);
+  --text: #221f18;       --muted: #6d6656;     --faint: #a29a86;
+  --amber: #c9721f;      --amber-2: #d9541b;   --amber-soft: rgba(201,114,31,.13);
+  --done: #128a5e;       --done-soft: rgba(18,138,94,.12);
+  --h0: #e9e1cf; --h1: #f2cea0; --h2: #e6a458; --h3: #d17f26; --h4: #b5641a;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(900px 500px at 82% -8%, rgba(246,161,61,.10), transparent 60%);
+  min-height: 100vh;
+}
+
+/* tiny reusable helpers we'll lean on later */
+.font-display { font-family: var(--font-d); }
+.font-mono-nums { font-family: var(--font-m); font-variant-numeric: tabular-nums; }
