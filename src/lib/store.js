@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ymd, today, addDays } from "./dates";
 
-const KEY = "ember-state-v1";
+const KEY = "tudum-state-v1";
 const COLORS = ["#f6a13d","#37d29a","#5aa2f6","#c98bff","#f97316","#e05a8a","#4bd0d0","#f2c94c"];
 
 // ---------- shape helpers ----------
@@ -75,7 +75,6 @@ function commit(next) {
   state = { ...next, updatedAt: Date.now() };
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
-    localStorage.setItem("todos", JSON.stringify(state.todos)); // keep old key in sync
   } catch { /* ignore */ }
   for (const l of listeners) l();
 }

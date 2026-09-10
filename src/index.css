@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-/* ================= Ember design tokens ================= */
+/* ================= TuDummmm design tokens ================= */
 /* Dark is the default. Light applies via OS preference OR a manual
-   [data-theme="light"] we'll set from a toggle button in Step 4.     */
+   [data-theme="light"] set from the navbar toggle button.           */
 :root {
   --bg: #16161d;         --surface: #1e1f28;   --surface-2: #262734;  --raise: #2e2f3e;
   --border: rgba(255,255,255,.09);             --border-strong: rgba(255,255,255,.16);

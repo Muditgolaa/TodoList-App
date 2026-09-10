@@ -1,22 +1,28 @@
 import { useEffect, useState } from "react";
 import { FiSun, FiMoon } from "react-icons/fi";
+import { useHashRoute } from "../lib/useHashRoute";
 
-// Read the saved choice, else follow the OS setting.
 function getInitialTheme() {
   try {
-    const saved = localStorage.getItem("ember-theme");
+    const saved = localStorage.getItem("tudum-theme");
     if (saved === "light" || saved === "dark") return saved;
   } catch { /* ignore */ }
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+const LINKS = [
+  { id: "dashboard", label: "Home", href: "#/dashboard" },
+  { id: "tasks", label: "Tasks", href: "#/tasks" },
+  { id: "about", label: "About", href: "#/about" },
+];
+
 const Navbar = () => {
   const [theme, setTheme] = useState(getInitialTheme);
+  const route = useHashRoute();
 
-  // Whenever theme changes: stamp <html> and remember the choice.
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem("ember-theme", theme); } catch { /* ignore */ }
+    try { localStorage.setItem("tudum-theme", theme); } catch { /* ignore */ }
   }, [theme]);
 
   const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
@@ -24,14 +30,24 @@ const Navbar = () => {
   return (
     <nav className="bg-[var(--surface)] border-b border-[var(--border)] px-4 py-3">
       <div className="container mx-auto flex justify-between items-center">
-        <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
+        <a href="#/dashboard" className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
           TuDummmm
-        </h2>
+        </a>
         <div className="flex items-center gap-6">
-          <ul className="flex gap-6 text-[var(--muted)]">
-            <li><a href="#" className="hover:text-[var(--text)] transition-colors">Home</a></li>
-            <li><a href="#" className="hover:text-[var(--text)] transition-colors">Tasks</a></li>
-            <li><a href="#" className="hover:text-[var(--text)] transition-colors">About</a></li>
+          <ul className="flex gap-6">
+            {LINKS.map((l) => (
+              <li key={l.id}>
+                <a
+                  href={l.href}
+                  className={
+                    (route === l.id ? "text-[var(--amber)] font-semibold" : "text-[var(--muted)]") +
+                    " hover:text-[var(--text)] transition-colors"
+                  }
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))}
           </ul>
           <button
             onClick={toggle}
