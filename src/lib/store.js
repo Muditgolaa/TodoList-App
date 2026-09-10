@@ -148,4 +148,9 @@ export const actions = {
   deleteTodo(id) {
     commit({ ...state, todos: state.todos.filter((x) => x.id !== id) });
   },
+    updateTodo(id, text) {
+    const clean = text.trim();
+    if (!clean) return;
+    commit({ ...state, todos: state.todos.map((x) => (x.id === id ? { ...x, todo: clean } : x)) });
+  },
 };
