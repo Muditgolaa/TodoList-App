@@ -59,7 +59,7 @@ function App() {
       <Navbar />
       <div className="mx-3 md:container md:mx-auto my-6 rounded-2xl p-6 min-h-[75vh] md:w-1/2 bg-[var(--surface)] border border-[var(--border)]">
         <h1 className="font-display font-bold text-xl text-center text-[var(--text)]">
-          TuDummmm — manage your daily todos
+          TuDummmm — manage your daily todos!!
         </h1>
 
         <div className="my-5">

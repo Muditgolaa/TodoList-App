@@ -25,7 +25,7 @@ const Navbar = () => {
     <nav className="bg-[var(--surface)] border-b border-[var(--border)] px-4 py-3">
       <div className="container mx-auto flex justify-between items-center">
         <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--text)]">
-          ember
+          TuDummmm
         </h2>
         <div className="flex items-center gap-6">
           <ul className="flex gap-6 text-[var(--muted)]">
