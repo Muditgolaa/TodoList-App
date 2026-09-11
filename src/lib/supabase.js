@@ -27,6 +27,13 @@ export function signIn(email, password) {
 export function signOut() {
   return supabase.auth.signOut();
 }
+export function signInWithGoogle() {
+  if (!supabase) return Promise.resolve({ error: new Error("cloud disabled") });
+  return supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin },
+  });
+}
 
 // ---------- per-user data ----------
 export async function cloudLoad(userId) {

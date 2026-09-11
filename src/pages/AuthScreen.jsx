@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { signIn, signUp } from "../lib/supabase";
+import { FcGoogle } from "react-icons/fc";
+import { signIn, signUp, signInWithGoogle } from "../lib/supabase";
 
 export default function AuthScreen() {
   const [mode, setMode] = useState("in"); // "in" | "up"
@@ -16,12 +17,16 @@ export default function AuthScreen() {
     const { data, error } = await fn(email, password);
     setBusy(false);
     if (error) { setErr(error.message); return; }
-    // If email confirmation is ON, sign-up returns no session yet.
     if (mode === "up" && !data.session) {
       setMsg("Account created. Check your email to confirm, then sign in.");
       setMode("in");
     }
-    // Otherwise onAuthStateChange logs the user in automatically.
+  };
+
+  const handleGoogle = async () => {
+    setErr("");
+    const { error } = await signInWithGoogle();
+    if (error) setErr(error.message); // otherwise the page redirects to Google
   };
 
   return (
@@ -31,6 +36,19 @@ export default function AuthScreen() {
         <p className="text-sm text-[var(--muted)] mt-1 mb-6">
           {mode === "in" ? "Sign in to track your streaks." : "Create an account to get started."}
         </p>
+
+        <button
+          type="button" onClick={handleGoogle}
+          className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--border-strong)] transition-colors"
+        >
+          <FcGoogle size={18} /> Continue with Google
+        </button>
+
+        <div className="flex items-center gap-3 my-5">
+          <div className="flex-1 h-px bg-[var(--border)]" />
+          <span className="text-xs text-[var(--faint)]">or</span>
+          <div className="flex-1 h-px bg-[var(--border)]" />
+        </div>
 
         <form onSubmit={submit} className="space-y-3">
           <input
