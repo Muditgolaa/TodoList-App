@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FiSun, FiMoon } from "react-icons/fi";
+import { FiSun, FiMoon, FiLogOut } from "react-icons/fi";
 import { useHashRoute } from "../lib/useHashRoute";
 
 function getInitialTheme() {
@@ -16,7 +16,7 @@ const LINKS = [
   { id: "about", label: "About", href: "#/about" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ user, onSignOut }) => {
   const [theme, setTheme] = useState(getInitialTheme);
   const route = useHashRoute();
 
@@ -56,6 +56,16 @@ const Navbar = () => {
           >
             {theme === "dark" ? <FiSun /> : <FiMoon />}
           </button>
+          {user && (
+            <button
+              onClick={onSignOut}
+              title={`Sign out (${user.email})`}
+              aria-label="Sign out"
+              className="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)] text-[var(--muted)] hover:text-[var(--amber-2)] hover:border-[var(--border-strong)] transition-colors"
+            >
+              <FiLogOut />
+            </button>
+          )}
         </div>
       </div>
     </nav>

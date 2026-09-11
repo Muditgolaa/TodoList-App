@@ -1,9 +1,14 @@
 import { useSyncExternalStore } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ymd, today, addDays } from "./dates";
+import { cloudEnabled, cloudLoad, cloudSave, cloudSubscribe } from "./supabase";
 
-const KEY = "tudum-state-v1";
 const COLORS = ["#f6a13d","#37d29a","#5aa2f6","#c98bff","#f97316","#e05a8a","#4bd0d0","#f2c94c"];
+
+let currentUserId = null; // null = guest / local-only
+function cacheKey() {
+  return currentUserId ? `tudum-state-${currentUserId}` : "tudum-state-v1";
+}
 
 // ---------- shape helpers ----------
 function blank() {
@@ -14,16 +19,9 @@ function blank() {
       { id: uuidv4(), name: "Core subject revision", color: COLORS[2] },
       { id: uuidv4(), name: "Reading / notes", color: COLORS[3] },
     ],
-    logs: {},
-    todos: [],
-    settings: {},
-    isDemo: false,
-    updatedAt: Date.now(),
+    logs: {}, todos: [], settings: {}, isDemo: false, updatedAt: Date.now(),
   };
 }
-
-// Seed ~9 weeks of believable history so a first-time visitor sees the
-// dashboard alive. Marked isDemo — cleared on their first real action.
 function demo() {
   const s = blank();
   s.isDemo = true;
@@ -32,8 +30,8 @@ function demo() {
     const d = ymd(addDays(new Date(), -i));
     let seed = Math.sin(i * 12.9898) * 43758.5453;
     seed = seed - Math.floor(seed);
-    let active = i <= 6 ? true : seed > 0.32; // last week strong
-    if (i === 9 || i === 16 || i === 23) active = false; // honest gaps
+    let active = i <= 6 ? true : seed > 0.32;
+    if (i === 9 || i === 16 || i === 23) active = false;
     if (!active) continue;
     const log = { done: {}, minutes: 0, note: "" };
     let howMany = i <= 6 ? 2 + Math.floor(seed * 3) : 1 + Math.floor(((seed * 7) % 1) * ids.length);
@@ -44,47 +42,73 @@ function demo() {
   }
   return s;
 }
-
-function load() {
+function loadLocal() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(cacheKey());
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
-
-  // First run: pull in any todos from the old app so nothing is lost.
-  let migrated = [];
-  try {
-    const old = localStorage.getItem("todos");
-    if (old) migrated = JSON.parse(old);
-  } catch { /* ignore */ }
-  if (migrated.length) return { ...blank(), todos: migrated };
-
+  // guest first-run: pull in legacy todos so nothing is lost
+  if (!currentUserId) {
+    try {
+      const old = localStorage.getItem("todos");
+      if (old) {
+        const migrated = JSON.parse(old);
+        if (migrated.length) return { ...blank(), todos: migrated };
+      }
+    } catch { /* ignore */ }
+  }
   return demo();
 }
 
-// ---------- external store plumbing ----------
-let state = load();
+// ---------- external store ----------
+let state = loadLocal();
 const listeners = new Set();
+function subscribe(cb) { listeners.add(cb); return () => listeners.delete(cb); }
+function notifyAll() { for (const l of listeners) l(); }
 
-function subscribe(cb) {
-  listeners.add(cb);
-  return () => listeners.delete(cb);
+function setState(next, cache = true) {
+  state = next;
+  if (cache) { try { localStorage.setItem(cacheKey(), JSON.stringify(state)); } catch { /* ignore */ } }
+  notifyAll();
 }
 
+let saveTimer = null;
 function commit(next) {
-  state = { ...next, updatedAt: Date.now() };
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  } catch { /* ignore */ }
-  for (const l of listeners) l();
+  setState({ ...next, updatedAt: Date.now() });
+  if (cloudEnabled && currentUserId) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => cloudSave(currentUserId, state), 600);
+  }
 }
 
-// React hook — any component calling this re-renders on every change.
+// adopt a newer remote state (live updates from another device)
+function adopt(remote) {
+  if (!remote || (remote.updatedAt || 0) <= (state.updatedAt || 0)) return;
+  setState(remote);
+}
+
 export function useStore() {
   return useSyncExternalStore(subscribe, () => state);
 }
 
-// ---------- small internal helpers ----------
+// ---------- called by the app when auth state changes ----------
+let unsub = null;
+export async function attachUser(user) {
+  clearTimeout(saveTimer);
+  if (unsub) { unsub(); unsub = null; }
+  currentUserId = user ? user.id : null;
+
+  setState(loadLocal()); // instant local render for this identity
+
+  if (cloudEnabled && currentUserId) {
+    const remote = await cloudLoad(currentUserId);
+    if (remote) setState(remote);                      // cloud is source of truth
+    else if (!state.isDemo) cloudSave(currentUserId, state); // seed real (never demo)
+    unsub = cloudSubscribe(currentUserId, adopt);
+  }
+}
+
+// ---------- helpers ----------
 function leaveDemo(next) {
   if (next.isDemo) return { ...next, logs: {}, isDemo: false };
   return next;
@@ -96,7 +120,7 @@ function withTodayLog(logs) {
   return { logs: { ...logs, [t]: log }, log, t };
 }
 
-// ---------- actions (the only way to change state) ----------
+// ---------- actions ----------
 export const actions = {
   toggleHabit(id) {
     let next = leaveDemo({ ...state });
@@ -133,22 +157,18 @@ export const actions = {
   startFresh() {
     commit({ ...state, logs: {}, isDemo: false });
   },
-  // ---- todos (Tasks page uses these in Step 6) ----
   addTodo(text) {
     const clean = text.trim();
     if (!clean) return;
     commit({ ...state, todos: [...state.todos, { id: uuidv4(), todo: clean, isCompleted: false }] });
   },
   toggleTodo(id) {
-    commit({
-      ...state,
-      todos: state.todos.map((x) => (x.id === id ? { ...x, isCompleted: !x.isCompleted } : x)),
-    });
+    commit({ ...state, todos: state.todos.map((x) => (x.id === id ? { ...x, isCompleted: !x.isCompleted } : x)) });
   },
   deleteTodo(id) {
     commit({ ...state, todos: state.todos.filter((x) => x.id !== id) });
   },
-    updateTodo(id, text) {
+  updateTodo(id, text) {
     const clean = text.trim();
     if (!clean) return;
     commit({ ...state, todos: state.todos.map((x) => (x.id === id ? { ...x, todo: clean } : x)) });
